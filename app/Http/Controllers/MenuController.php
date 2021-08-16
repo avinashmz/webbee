@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller as BaseController;
 
 class MenuController extends BaseController
 {
+
     /*
     Requirements:
     - the eloquent expressions should result in EXACTLY one SQL query no matter the nesting level or the amount of menu items.
@@ -94,7 +95,32 @@ class MenuController extends BaseController
     ]
      */
 
+
+    public function buildMenuTree($menuItems, $parentId = null) {
+
+        $tree = [];
+
+        foreach ($menuItems as $menu) {
+            if ($menu['parent_id'] == $parentId) {
+                $childMenu = $this->buildMenuTree($menuItems, $menu['id']);
+
+                if (count($childMenu) > 0) {
+                    $menu['children'] = $childMenu;
+                }
+                $tree[] = $menu;
+            }
+        }
+
+        return $tree;
+    }
+
     public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+
+        $menuItems = MenuItem::orderBy('parent_id', 'ASC')->get()->toArray();
+
+        $result = $this->buildMenuTree($menuItems);
+
+        return json_encode($result);
+
     }
 }
