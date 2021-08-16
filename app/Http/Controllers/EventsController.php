@@ -100,7 +100,7 @@ class EventsController extends BaseController
 
     public function getEventsWithWorkshops() {
 
-        $events = Event::get()->unique('name')->keyBy('id')->toArray();
+        $events = Event::get()->keyBy('id')->toArray();
 
         $workshops = Workshop::whereIn('event_id', array_keys($events))->get()->keyBy('id')->groupBy('event_id')->toArray();
 
